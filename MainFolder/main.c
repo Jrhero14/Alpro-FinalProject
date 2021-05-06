@@ -12,7 +12,6 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
     char dumpCsv[100];
     char dumpTxt[100];
     char fileNameTXT[15];
-    char namaLog[100];
     char IdLog[15];
     char saldoLog[100];
     char *token;
