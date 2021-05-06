@@ -4,8 +4,6 @@
 #include <time.h>
 
 void TampilkanDaftarAkun(int ID, int nama, int saldo){
-    int count = 1;
-
     FILE * fpointer, *fp;
     fpointer = fopen("account.csv", "r");
 
@@ -38,7 +36,6 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
             printf("  Saldo: %s\n", saldoLog);
         }
         printf("\n");
-        count++;
     }
     fclose(fp);
     fclose(fpointer);
