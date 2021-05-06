@@ -1,14 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<time.h>
+#include <time.h>
+
+void TampilkanDaftarAkun(int ID, int nama, int saldo){
+    int count = 1;
+
+    FILE * fpointer, *fp;
+    fpointer = fopen("account.csv", "r");
+
+    char dumpCsv[100];
+    char dumpTxt[100];
+    char fileNameTXT[15];
+    char namaLog[100];
+    char IdLog[15];
+    char saldoLog[100];
+    char *token;
+    fgets(dumpCsv, sizeof(dumpCsv), fpointer);
+    while (fgets(dumpCsv, sizeof(dumpCsv), fpointer)){
+        token = strtok(dumpCsv, ",");
+        strcpy(IdLog, token);
+        token = strtok(NULL, ",");
+        strcpy(saldoLog, token);
+
+        if (ID == 1){
+            printf("  ID: %s\n", IdLog);
+        }
+
+        strcpy(fileNameTXT,IdLog);
+        strcat(fileNameTXT, ".txt");
+        fp = fopen(fileNameTXT, "r");
+        fscanf(fp, "%[^\n]", dumpTxt);
+        if (nama == 1){
+            printf("  %s\n", strtok(dumpTxt, " "));
+        }
+
+        if (saldo == 1){
+            printf("  Saldo: %s\n", saldoLog);
+        }
+        printf("\n");
+        count++;
+    }
+    fclose(fp);
+    fclose(fpointer);
+    printf("-----------------------------\n");
+}
 
 //   MODE ADMIN
 int adminMode();
 int tambahAkun();
-
+int hapusAkun();
 //   MODE USER
 int userMode(int ID);
+
+
 
 int main(){
     int pilih, ID;
@@ -117,6 +162,7 @@ int adminMode(){
                 tambahAkun();
                 break;
             case 2:
+                hapusAkun();
                 break;
             case 3:
                 break;
@@ -200,6 +246,58 @@ int tambahAkun(){
 
     system("pause");
     return 0;
+}
+
+int hapusAkun(){
+    int pilID;
+    printf("   PROGRAM KAS KELAS\n"
+           "       --ADMIN--\n"
+           "      HAPUS AKUN\n"
+           "AKUN YANG TERDAFTAR\n");
+    TampilkanDaftarAkun(1,1,0);
+    printf("PILIH ID:");
+    scanf("%d", &pilID);
+
+    FILE *fpointer, *fp;
+    fpointer = fopen("account.csv", "r");
+    fp = fopen("temp.csv", "w");
+
+    char dump[50];
+    char dump2[50];
+    char *token;
+    fgets(dump, sizeof(dump), fpointer);
+    fprintf(fp,dump);
+    token = strtok(dump, ",");
+    while (fgets(dump, sizeof(dump), fpointer)){
+        strcpy(dump2, dump);
+        token = strtok(dump, ",");
+
+        if (atoi(token) != pilID){
+            fprintf(fp, dump2);
+        }
+
+    }
+    fclose(fp);
+    fclose(fpointer);
+
+    fpointer = fopen("temp.csv", "r");
+    fp = fopen("account.csv", "w");
+
+    while (fgets(dump, sizeof(dump), fpointer)){
+        fprintf(fp, dump);
+    }
+
+    fclose(fp);
+    fclose(fpointer);
+
+    remove("temp.csv");
+    char fileTarget[15];
+    itoa(pilID, fileTarget, 10);
+    strcat(fileTarget, ".txt");
+    remove(fileTarget);
+
+    printf("HAPUS AKUN BERHASIL\n");
+    system("pause");
 }
 
 //   MODE USER
