@@ -315,7 +315,7 @@ int adminMode(){
 
 int tambahAkun(){
     int umur, pilKelamin, ID;
-    char nama[50], tanggal[10], jenisKelamin[12], password[100];
+    char nama[50], tanggal[12], jenisKelamin[12], password[100];
     printf("   PROGRAM KAS KELAS\n"
            "       --ADMIN--\n"
            "      TAMBAH AKUN\n");
