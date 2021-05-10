@@ -42,7 +42,6 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
     fclose(fpointer);
     printf("-----------------------------\n");
 }
-
 int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     int nominalDump;
     char fileTXT[15];
@@ -117,65 +116,6 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     fprintf(fpointer, "    NOMINAL: %d\n\n", Nominal);
 
     fclose(fpointer);
-}
-
-int getSaldo(int ID){
-    FILE *fptr = fopen("account.csv", "r");
-
-    if(fptr == NULL){
-        printf("Error, File account.csv tidak ditemukan\n");
-        exit(1);
-    }
-    
-    char buffer[200];
-
-    int read_id;
-    long int saldo;
-    char password[100]; 
-    //mencari saldo berdasarkan id
-    while(fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password)){
-        if(ID == read_id)
-            break;
-    }
-    fclose(fptr);
-    return saldo;
-}
-
-void lihatDetailAkun(int ID, int mode){
-    system("cls");
-    char buff[100], txtFile[15];
-    itoa(ID, txtFile, 10);
-    strcat(txtFile, ".txt");
-    //membuka akun file txt
-    FILE *fptr = fopen(txtFile, "r");
-
-    if(fptr == NULL){
-        printf("Error, file %d.txt tidak ditemukan\n", ID);
-        exit(1);
-    }
-
-    printf("   PROGRAM KAS KELAS\n"
-           "   LIHAT DETAIL AKUN\n");
-    if(mode == 0)
-        printf("       --ADMIN--\n");
-    else
-        printf("       --USER--\n");
-    printf("INFORMASI AKUN :\n");
-
-    printf("     ID : %d\n", ID);
-    for(int i = 0; i<4; i++){
-        fgets(buff, sizeof(buff), fptr);
-        printf("%s", buff);
-    }
-    //mencari saldo id bersangkutan di account.csv
-    printf("Saldo : %d\n", getSaldo(ID));
-    //mencetak keseluruhan isi file akun txt
-    while(fgets(buff, sizeof(buff), fptr))
-        printf("%s\n", buff);
-    
-    printf("\n----------------------------\n");
-    system("pause");
-    fclose(fptr);
 }
 
 //   MODE ADMIN
@@ -367,7 +307,7 @@ int tambahAkun(){
     fpointer = fopen(txtFile, "w");
     fprintf(fpointer, "     NAMA:%s\n"
                       "     UMUR:%d\n"
-                      "     TANGGAL LAHIR:%s"
+                      "     TANGGAL LAHIR:%s\n"
                       "     KELAMIN:%s\n"
                       "------History Transaksi------",nama, umur, tanggal, jenisKelamin);
     fclose(fpointer);
@@ -469,32 +409,7 @@ int setorAdmin(){
 
 //   MODE USER
 int userMode(int ID){
-    int pilih;
-    while (1){
-        printf("   PROGRAM KAS KELAS\n"
-               "       --USER--\n"
-               "1. LIHAT INFORMASI AKUN\n"
-               "2. TARIK TUNAI\n"
-               "3. TRANSFER\n"
-               "4. exit\n");
-        printf("pilih:");
-        scanf("%d", &pilih);
-
-        switch (pilih) {
-            case 1:
-                lihatDetailAkun(ID, 1);
-                break;
-            case 2:
-                // tarikTunai();
-                break;
-            case 3:
-                // transfer();
-                break;
-            case 4:
-                exit(0);
-            default:
-                printf("maaf tidak ada dalam menu\n");
-        }
-    }
+    printf("ANDA MASUK SEBAGAI USER\n");
+    system("pause");
     return 0;
 }
