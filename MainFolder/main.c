@@ -118,101 +118,11 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     fclose(fpointer);
 }
 
-int tarikTunai(int ID, int Nominal)
-{ // PAKAI INI UNTUK SETOR TUNAI
-    int nominalDump;
-    char fileTXT[15];
-
-    itoa(ID, fileTXT, 10);
-    strcat(fileTXT, ".txt");
-
-    FILE *fpointer, *fp;
-    fpointer = fopen("account.csv", "r");
-    fp = fopen("temp.csv", "w");
-
-    char dump[100], dump2[100], charNominal[100];
-    char *token;
-    fgets(dump, sizeof(dump), fpointer);
-    fprintf(fp, dump);
-    while (fgets(dump, sizeof(dump), fpointer))
-    {
-        strcpy(dump2, dump);
-        token = strtok(dump, ",");
-        if (atoi(token) == ID)
-        {
-            fprintf(fp, token);
-            fprintf(fp, ",");
-            token = strtok(NULL, ",");
-            nominalDump = atoi(token);
-            if(nominalDump == 0){
-                return 0;
-            }
-            nominalDump = nominalDump - Nominal;
-            itoa(nominalDump, charNominal, 10);
-            fprintf(fp, charNominal);
-            fprintf(fp, ",");
-            token = strtok(NULL, ",");
-            fprintf(fp, token);
-        }
-        else
-        {
-            fprintf(fp, dump2);
-        }
-    }
-    fclose(fp);
-    fclose(fpointer);
-
-    fpointer = fopen("temp.csv", "r");
-    fp = fopen("account.csv", "w");
-
-    while (fgets(dump, sizeof(dump), fpointer))
-    {
-        fprintf(fp, dump);
-    }
-
-    fclose(fp);
-    fclose(fpointer);
-    remove("temp.csv");
-
-    char tgl[20], waktu[20];
-
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    char Bulan[10], Hari[10], Jam[10], Menit[10], Detik[10];
-    itoa(tm.tm_year + 1900, tgl, 10);
-    strcat(tgl, "/");
-    itoa(tm.tm_mon + 1, Bulan, 10);
-    itoa(tm.tm_mday, Hari, 10);
-    strcat(tgl, Bulan);
-    strcat(tgl, "/");
-    strcat(tgl, Hari);
-
-    itoa(tm.tm_hour, waktu, 10);
-    strcat(waktu, ":");
-    itoa(tm.tm_min, Menit, 10);
-    itoa(tm.tm_sec, Detik, 10);
-    strcat(waktu, Menit);
-    strcat(waktu, ":");
-    strcat(waktu, Detik);
-
-    fpointer = fopen(fileTXT, "a");
-    fprintf(fpointer, "\n[+] TARIK TUNAI\n");
-
-    fprintf(fpointer, "    TGL: %s\n", tgl);
-
-    fprintf(fpointer, "    PUKUL: %s\n", waktu);
-    fprintf(fpointer, "    NOMINAL: %d\n\n", Nominal);
-
-    fclose(fpointer);
-    return 1;
-}
-
 //   MODE ADMIN
 int adminMode();
 int tambahAkun();
 int hapusAkun();
 int setorAdmin();
-int tarikAdmin();
 
 //   MODE USER
 int userMode(int ID);
@@ -486,46 +396,6 @@ int setorAdmin(){
             scanf("%d", &nominal);
             setorTunai(plhID, nominal);
             printf("Setor tunai berhasil dilakukan\n");
-            system("pause");
-            fclose(fpointer);
-            return 0;
-        }
-    }
-
-    fclose(fpointer);
-    printf("Akun tidak ditemukan!!\n");
-    system("pause");
-}
-
-int tarikAdmin()
-{
-    int plhID, nominal;
-    printf("   PROGRAM KAS KELAS\n"
-           "       --ADMIN--\n"
-           "      TARIK TUNAI\n"
-           "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1, 1, 1);
-    printf("PILIH ID:");
-    scanf("%d", &plhID);
-
-    FILE *fpointer;
-    fpointer = fopen("account.csv", "r");
-
-    char dump[100];
-    char *token;
-    while (fgets(dump, sizeof(dump), fpointer))
-    {
-        token = strtok(dump, ",");
-        if (atoi(token) == plhID)
-        {
-            printf("Masukan nominal:");
-            scanf("%d", &nominal);
-            if(tarikTunai(plhID, nominal)){
-                printf("Tarik tunai berhasil dilakukan\n");
-            }
-            else{
-                printf("Tarik tunai gagal karena saldo tidak mencukupi\n");
-            }
             system("pause");
             fclose(fpointer);
             return 0;
