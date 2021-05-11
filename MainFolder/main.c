@@ -248,6 +248,31 @@ void lihatDetailAkun(int ID, int mode)
     fclose(fptr);
 }
 
+int getSaldo(int ID)
+{
+    FILE *fptr = fopen("account.csv", "r");
+
+    if (fptr == NULL)
+    {
+        printf("Error, File account.csv tidak ditemukan\n");
+        exit(1);
+    }
+
+    char buffer[200];
+
+    int read_id;
+    long int saldo;
+    char password[100];
+    //mencari saldo berdasarkan id
+    while (fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password))
+    {
+        if (ID == read_id)
+            break;
+    }
+    fclose(fptr);
+    return saldo;
+}
+
 //   MODE ADMIN
 int adminMode();
 int tambahAkun();
