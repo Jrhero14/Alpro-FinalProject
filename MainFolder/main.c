@@ -208,6 +208,46 @@ int tarikTunai(int ID, int Nominal)
     return 1;
 }
 
+void lihatDetailAkun(int ID, int mode)
+{
+    system("cls");
+    char buff[100], txtFile[15];
+    itoa(ID, txtFile, 10);
+    strcat(txtFile, ".txt");
+    //membuka akun file txt
+    FILE *fptr = fopen(txtFile, "r");
+
+    if (fptr == NULL)
+    {
+        printf("Error, file %d.txt tidak ditemukan\n", ID);
+        exit(1);
+    }
+
+    printf("   PROGRAM KAS KELAS\n"
+           "   LIHAT DETAIL AKUN\n");
+    if (mode == 0)
+        printf("       --ADMIN--\n");
+    else
+        printf("       --USER--\n");
+    printf("INFORMASI AKUN :\n");
+
+    printf("     ID : %d\n", ID);
+    for (int i = 0; i < 4; i++)
+    {
+        fgets(buff, sizeof(buff), fptr);
+        printf("%s", buff);
+    }
+    //mencari saldo id bersangkutan di account.csv
+    printf("Saldo : %d\n", getSaldo(ID));
+    //mencetak keseluruhan isi file akun txt
+    while (fgets(buff, sizeof(buff), fptr))
+        printf("%s\n", buff);
+
+    printf("\n----------------------------\n");
+    system("pause");
+    fclose(fptr);
+}
+
 //   MODE ADMIN
 int adminMode();
 int tambahAkun();
@@ -540,7 +580,15 @@ int tarikAdmin()
 }
 
 int detailAdmin(){
-    
+    int plhID, nominal;
+    printf("   PROGRAM KAS KELAS\n"
+           "       --ADMIN--\n"
+           "      TARIK TUNAI\n"
+           "AKUN YANG TERDAFTAR\n");
+    TampilkanDaftarAkun(1, 1, 1);
+    printf("PILIH ID:");
+    scanf("%d", &plhID);
+    lihatDetailAkun(plhID, 0);
 }
 
 //   MODE USER
