@@ -4,7 +4,31 @@
 #include <time.h>
 
 // Universal Function
-void TampilkanDaftarAkun(int ID, int nama, int saldo){
+int getSaldo(int ID)
+{
+    FILE *fptr = fopen("account.csv", "r");
+
+    if (fptr == NULL)
+    {
+        printf("Error, File account.csv tidak ditemukan\n");
+        exit(1);
+    }
+
+    char buffer[200];
+
+    int read_id;
+    long int saldo;
+    char password[100];
+    //mencari saldo berdasarkan id
+    while (fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password))
+    {
+        if (ID == read_id)
+            break;
+    }
+    fclose(fptr);
+    return saldo;
+}
+int TampilkanDaftarAkun(int ID, int nama, int saldo){
     FILE * fpointer, *fp;
     fpointer = fopen("account.csv", "r");
 
@@ -14,6 +38,16 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
     char IdLog[15];
     char saldoLog[100];
     char *token;
+    int cek = 0;
+    while (fgets(dumpCsv, sizeof(dumpCsv), fpointer)){
+        cek++;
+    }
+    if(cek == 1){
+        printf("Tidak ada akun yang terdaftar\n");
+        return 1;
+    }
+    fclose(fpointer);
+    fpointer = fopen("account.csv", "r");
     fgets(dumpCsv, sizeof(dumpCsv), fpointer);
     while (fgets(dumpCsv, sizeof(dumpCsv), fpointer)){
         token = strtok(dumpCsv, ",");
@@ -41,8 +75,8 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
     fclose(fp);
     fclose(fpointer);
     printf("-----------------------------\n");
+    return 0;
 }
-
 int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     int nominalDump;
     char fileTXT[15];
@@ -109,7 +143,7 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
 
 
     fpointer = fopen(fileTXT, "a");
-    fprintf(fpointer, "\n[+] SETOR TUNAI\n");
+    fprintf(fpointer, "[+] SETOR TUNAI\n");
 
     fprintf(fpointer, "    TGL: %s\n", tgl);
 
@@ -119,60 +153,131 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     fclose(fpointer);
 }
 
-int getSaldo(int ID){
-    FILE *fptr = fopen("account.csv", "r");
+int tarikTunai(int ID, int Nominal)
+{ // PAKAI INI UNTUK TARIK TUNAI
+    int nominalDump;
+    char fileTXT[15];
 
-    if(fptr == NULL){
-        printf("Error, File account.csv tidak ditemukan\n");
-        exit(1);
-    }
-    
-    char buffer[200];
+    itoa(ID, fileTXT, 10);
+    strcat(fileTXT, ".txt");
 
-    int read_id;
-    long int saldo;
-    char password[100]; 
-    //mencari saldo berdasarkan id
-    while(fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password)){
-        if(ID == read_id)
-            break;
+    FILE *fpointer, *fp;
+    fpointer = fopen("account.csv", "r");
+    fp = fopen("temp.csv", "w");
+
+    char dump[100], dump2[100], charNominal[100];
+    char *token;
+    fgets(dump, sizeof(dump), fpointer);
+    fprintf(fp, dump);
+    while (fgets(dump, sizeof(dump), fpointer))
+    {
+        strcpy(dump2, dump);
+        token = strtok(dump, ",");
+        if (atoi(token) == ID)
+        {
+            fprintf(fp, token);
+            fprintf(fp, ",");
+            token = strtok(NULL, ",");
+            nominalDump = atoi(token);
+            if (nominalDump == 0)
+            {
+                return 0;
+            }
+            nominalDump = nominalDump - Nominal;
+            itoa(nominalDump, charNominal, 10);
+            fprintf(fp, charNominal);
+            fprintf(fp, ",");
+            token = strtok(NULL, ",");
+            fprintf(fp, token);
+        }
+        else
+        {
+            fprintf(fp, dump2);
+        }
     }
-    fclose(fptr);
-    return saldo;
+    fclose(fp);
+    fclose(fpointer);
+
+    fpointer = fopen("temp.csv", "r");
+    fp = fopen("account.csv", "w");
+
+    while (fgets(dump, sizeof(dump), fpointer))
+    {
+        fprintf(fp, dump);
+    }
+
+    fclose(fp);
+    fclose(fpointer);
+    remove("temp.csv");
+
+    char tgl[20], waktu[20];
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char Bulan[10], Hari[10], Jam[10], Menit[10], Detik[10];
+    itoa(tm.tm_year + 1900, tgl, 10);
+    strcat(tgl, "/");
+    itoa(tm.tm_mon + 1, Bulan, 10);
+    itoa(tm.tm_mday, Hari, 10);
+    strcat(tgl, Bulan);
+    strcat(tgl, "/");
+    strcat(tgl, Hari);
+
+    itoa(tm.tm_hour, waktu, 10);
+    strcat(waktu, ":");
+    itoa(tm.tm_min, Menit, 10);
+    itoa(tm.tm_sec, Detik, 10);
+    strcat(waktu, Menit);
+    strcat(waktu, ":");
+    strcat(waktu, Detik);
+
+    fpointer = fopen(fileTXT, "a");
+    fprintf(fpointer, "[-] TARIK TUNAI\n");
+
+    fprintf(fpointer, "    TGL: %s\n", tgl);
+
+    fprintf(fpointer, "    PUKUL: %s\n", waktu);
+    fprintf(fpointer, "    NOMINAL: %d\n\n", Nominal);
+
+    fclose(fpointer);
+    return 1;
 }
 
-void lihatDetailAkun(int ID, int mode){
-    system("cls");
+void lihatDetailAkun(int ID, int mode)
+{
+//    system("cls");
     char buff[100], txtFile[15];
     itoa(ID, txtFile, 10);
     strcat(txtFile, ".txt");
     //membuka akun file txt
     FILE *fptr = fopen(txtFile, "r");
 
-    if(fptr == NULL){
+    if (fptr == NULL)
+    {
         printf("Error, file %d.txt tidak ditemukan\n", ID);
         exit(1);
     }
 
     printf("   PROGRAM KAS KELAS\n"
            "   LIHAT DETAIL AKUN\n");
-    if(mode == 0)
+    if (mode == 0)
         printf("       --ADMIN--\n");
     else
         printf("       --USER--\n");
     printf("INFORMASI AKUN :\n");
 
     printf("     ID : %d\n", ID);
-    for(int i = 0; i<4; i++){
+    for (int i = 0; i < 4; i++)
+    {
         fgets(buff, sizeof(buff), fptr);
         printf("%s", buff);
     }
     //mencari saldo id bersangkutan di account.csv
     printf("Saldo : %d\n", getSaldo(ID));
     //mencetak keseluruhan isi file akun txt
-    while(fgets(buff, sizeof(buff), fptr))
-        printf("%s\n", buff);
-    
+    while (fgets(buff, sizeof(buff), fptr))
+        printf("%s", buff);
+
     printf("\n----------------------------\n");
     system("pause");
     fclose(fptr);
@@ -183,9 +288,11 @@ int adminMode();
 int tambahAkun();
 int hapusAkun();
 int setorAdmin();
-
+int tarikAdmin();
+int detailAdmin();
 //   MODE USER
 int userMode(int ID);
+int tarikUser(int ID);
 
 
 int main(){
@@ -301,8 +408,10 @@ int adminMode(){
                 setorAdmin();
                 break;
             case 4:
+                tarikAdmin();
                 break;
             case 5:
+                detailAdmin();
                 break;
             case 6:
                 exit(0);
@@ -369,7 +478,7 @@ int tambahAkun(){
                       "     UMUR:%d\n"
                       "     TANGGAL LAHIR:%s"
                       "     KELAMIN:%s\n"
-                      "------History Transaksi------",nama, umur, tanggal, jenisKelamin);
+                      "------History Transaksi------\n",nama, umur, tanggal, jenisKelamin);
     fclose(fpointer);
 
     fpointer = fopen("account.csv", "a");
@@ -388,9 +497,13 @@ int hapusAkun(){
            "       --ADMIN--\n"
            "      HAPUS AKUN\n"
            "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1,1,0);
-    printf("PILIH ID:");
-    scanf("%d", &pilID);
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &pilID);
+    }
 
     FILE *fpointer, *fp;
     fpointer = fopen("account.csv", "r");
@@ -440,9 +553,13 @@ int setorAdmin(){
            "       --ADMIN--\n"
            "      SETOR TUNAI\n"
            "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1, 1, 1);
-    printf("PILIH ID:");
-    scanf("%d", &plhID);
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &plhID);
+    }
 
     FILE *fpointer;
     fpointer = fopen("account.csv", "r");
@@ -467,6 +584,68 @@ int setorAdmin(){
     system("pause");
 }
 
+int tarikAdmin()
+{
+    int plhID, nominal;
+    printf("   PROGRAM KAS KELAS\n"
+           "       --ADMIN--\n"
+           "      TARIK TUNAI\n"
+           "AKUN YANG TERDAFTAR\n");
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &plhID);
+    }
+
+    FILE *fpointer;
+    fpointer = fopen("account.csv", "r");
+
+    char dump[100];
+    char *token;
+    while (fgets(dump, sizeof(dump), fpointer))
+    {
+        token = strtok(dump, ",");
+        if (atoi(token) == plhID)
+        {
+            printf("Masukan nominal:");
+            scanf("%d", &nominal);
+            if (tarikTunai(plhID, nominal))
+            {
+                printf("Tarik tunai berhasil dilakukan\n");
+            }
+            else
+            {
+                printf("Tarik tunai gagal karena saldo tidak mencukupi\n");
+            }
+            system("pause");
+            fclose(fpointer);
+            return 0;
+        }
+    }
+
+    fclose(fpointer);
+    printf("Akun tidak ditemukan!!\n");
+    system("pause");
+}
+
+int detailAdmin(){
+    int plhID, nominal;
+    printf("   PROGRAM KAS KELAS\n"
+           "       --ADMIN--\n"
+           "      TARIK TUNAI\n"
+           "AKUN YANG TERDAFTAR\n");
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &plhID);
+    }
+    lihatDetailAkun(plhID, 0);
+}
+
 //   MODE USER
 int userMode(int ID){
     int pilih;
@@ -485,7 +664,7 @@ int userMode(int ID){
                 lihatDetailAkun(ID, 1);
                 break;
             case 2:
-                // tarikTunai();
+                tarikUser(ID);
                 break;
             case 3:
                 // transfer();
@@ -496,5 +675,27 @@ int userMode(int ID){
                 printf("maaf tidak ada dalam menu\n");
         }
     }
+    return 0;
+}
+
+int tarikUser(int ID)
+{
+    int nominal;
+    printf("   PROGRAM KAS KELAS\n"
+           "       --USER--\n"
+           "      TARIK TUNAI\n"
+           "AKUN YANG TERDAFTAR\n");
+    printf("Masukan nominal:");
+    scanf("%d", &nominal);
+
+    if (tarikTunai(ID, nominal))
+    {
+        printf("Tarik tunai berhasil dilakukan\n");
+    }
+    else
+    {
+        printf("Tarik tunai gagal karena saldo tidak mencukupi\n");
+    }
+    system("pause");
     return 0;
 }
