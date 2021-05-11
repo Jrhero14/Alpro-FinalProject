@@ -4,7 +4,31 @@
 #include <time.h>
 
 // Universal Function
-void TampilkanDaftarAkun(int ID, int nama, int saldo){
+int getSaldo(int ID)
+{
+    FILE *fptr = fopen("account.csv", "r");
+
+    if (fptr == NULL)
+    {
+        printf("Error, File account.csv tidak ditemukan\n");
+        exit(1);
+    }
+
+    char buffer[200];
+
+    int read_id;
+    long int saldo;
+    char password[100];
+    //mencari saldo berdasarkan id
+    while (fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password))
+    {
+        if (ID == read_id)
+            break;
+    }
+    fclose(fptr);
+    return saldo;
+}
+int TampilkanDaftarAkun(int ID, int nama, int saldo){
     FILE * fpointer, *fp;
     fpointer = fopen("account.csv", "r");
 
@@ -14,6 +38,16 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
     char IdLog[15];
     char saldoLog[100];
     char *token;
+    int cek = 0;
+    while (fgets(dumpCsv, sizeof(dumpCsv), fpointer)){
+        cek++;
+    }
+    if(cek == 1){
+        printf("Tidak ada akun yang terdaftar\n");
+        return 1;
+    }
+    fclose(fpointer);
+    fpointer = fopen("account.csv", "r");
     fgets(dumpCsv, sizeof(dumpCsv), fpointer);
     while (fgets(dumpCsv, sizeof(dumpCsv), fpointer)){
         token = strtok(dumpCsv, ",");
@@ -41,6 +75,7 @@ void TampilkanDaftarAkun(int ID, int nama, int saldo){
     fclose(fp);
     fclose(fpointer);
     printf("-----------------------------\n");
+    return 0;
 }
 int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     int nominalDump;
@@ -108,7 +143,7 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
 
 
     fpointer = fopen(fileTXT, "a");
-    fprintf(fpointer, "\n[+] SETOR TUNAI\n");
+    fprintf(fpointer, "[+] SETOR TUNAI\n");
 
     fprintf(fpointer, "    TGL: %s\n", tgl);
 
@@ -119,7 +154,7 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
 }
 
 int tarikTunai(int ID, int Nominal)
-{ // PAKAI INI UNTUK SETOR TUNAI
+{ // PAKAI INI UNTUK TARIK TUNAI
     int nominalDump;
     char fileTXT[15];
 
@@ -197,7 +232,7 @@ int tarikTunai(int ID, int Nominal)
     strcat(waktu, Detik);
 
     fpointer = fopen(fileTXT, "a");
-    fprintf(fpointer, "\n[+] TARIK TUNAI\n");
+    fprintf(fpointer, "[-] TARIK TUNAI\n");
 
     fprintf(fpointer, "    TGL: %s\n", tgl);
 
@@ -210,7 +245,7 @@ int tarikTunai(int ID, int Nominal)
 
 void lihatDetailAkun(int ID, int mode)
 {
-    system("cls");
+//    system("cls");
     char buff[100], txtFile[15];
     itoa(ID, txtFile, 10);
     strcat(txtFile, ".txt");
@@ -241,36 +276,11 @@ void lihatDetailAkun(int ID, int mode)
     printf("Saldo : %d\n", getSaldo(ID));
     //mencetak keseluruhan isi file akun txt
     while (fgets(buff, sizeof(buff), fptr))
-        printf("%s\n", buff);
+        printf("%s", buff);
 
     printf("\n----------------------------\n");
     system("pause");
     fclose(fptr);
-}
-
-int getSaldo(int ID)
-{
-    FILE *fptr = fopen("account.csv", "r");
-
-    if (fptr == NULL)
-    {
-        printf("Error, File account.csv tidak ditemukan\n");
-        exit(1);
-    }
-
-    char buffer[200];
-
-    int read_id;
-    long int saldo;
-    char password[100];
-    //mencari saldo berdasarkan id
-    while (fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password))
-    {
-        if (ID == read_id)
-            break;
-    }
-    fclose(fptr);
-    return saldo;
 }
 
 //   MODE ADMIN
@@ -278,7 +288,8 @@ int adminMode();
 int tambahAkun();
 int hapusAkun();
 int setorAdmin();
-
+int tarikAdmin();
+int detailAdmin();
 //   MODE USER
 int userMode(int ID);
 
@@ -396,8 +407,10 @@ int adminMode(){
                 setorAdmin();
                 break;
             case 4:
+                tarikAdmin();
                 break;
             case 5:
+                detailAdmin();
                 break;
             case 6:
                 exit(0);
@@ -462,9 +475,9 @@ int tambahAkun(){
     fpointer = fopen(txtFile, "w");
     fprintf(fpointer, "     NAMA:%s\n"
                       "     UMUR:%d\n"
-                      "     TANGGAL LAHIR:%s\n"
+                      "     TANGGAL LAHIR:%s"
                       "     KELAMIN:%s\n"
-                      "------History Transaksi------",nama, umur, tanggal, jenisKelamin);
+                      "------History Transaksi------\n",nama, umur, tanggal, jenisKelamin);
     fclose(fpointer);
 
     fpointer = fopen("account.csv", "a");
@@ -483,9 +496,13 @@ int hapusAkun(){
            "       --ADMIN--\n"
            "      HAPUS AKUN\n"
            "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1,1,0);
-    printf("PILIH ID:");
-    scanf("%d", &pilID);
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &pilID);
+    }
 
     FILE *fpointer, *fp;
     fpointer = fopen("account.csv", "r");
@@ -535,9 +552,13 @@ int setorAdmin(){
            "       --ADMIN--\n"
            "      SETOR TUNAI\n"
            "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1, 1, 1);
-    printf("PILIH ID:");
-    scanf("%d", &plhID);
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &plhID);
+    }
 
     FILE *fpointer;
     fpointer = fopen("account.csv", "r");
@@ -569,9 +590,13 @@ int tarikAdmin()
            "       --ADMIN--\n"
            "      TARIK TUNAI\n"
            "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1, 1, 1);
-    printf("PILIH ID:");
-    scanf("%d", &plhID);
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &plhID);
+    }
 
     FILE *fpointer;
     fpointer = fopen("account.csv", "r");
@@ -610,9 +635,13 @@ int detailAdmin(){
            "       --ADMIN--\n"
            "      TARIK TUNAI\n"
            "AKUN YANG TERDAFTAR\n");
-    TampilkanDaftarAkun(1, 1, 1);
-    printf("PILIH ID:");
-    scanf("%d", &plhID);
+    if (TampilkanDaftarAkun(1,1,0))
+    {
+        return 0;
+    }else{
+        printf("PILIH ID:");
+        scanf("%d", &plhID);
+    }
     lihatDetailAkun(plhID, 0);
 }
 
