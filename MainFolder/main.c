@@ -553,7 +553,7 @@ int setorAdmin(){
            "       --ADMIN--\n"
            "      SETOR TUNAI\n"
            "AKUN YANG TERDAFTAR\n");
-    if (TampilkanDaftarAkun(1,1,0))
+    if (TampilkanDaftarAkun(1,1,1))
     {
         return 0;
     }else{
@@ -591,7 +591,7 @@ int tarikAdmin()
            "       --ADMIN--\n"
            "      TARIK TUNAI\n"
            "AKUN YANG TERDAFTAR\n");
-    if (TampilkanDaftarAkun(1,1,0))
+    if (TampilkanDaftarAkun(1,1,1))
     {
         return 0;
     }else{
