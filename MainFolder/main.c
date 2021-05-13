@@ -6,6 +6,7 @@
 // Universal Function
 int getSaldo(int ID)
 {
+    int finded = 0;
     FILE *fptr = fopen("account.csv", "r");
 
     if (fptr == NULL)
@@ -17,16 +18,21 @@ int getSaldo(int ID)
     char buffer[200];
 
     int read_id;
-    long int saldo;
+    int saldo;
     char password[100];
     //mencari saldo berdasarkan id
-    while (fscanf(fptr, "%d,%ld,[^,]", &read_id, &saldo, &password))
+    while ((fscanf(fptr,"%d, %d, %s", &read_id, &saldo, &password)) != -1)
     {
-        if (ID == read_id)
-            break;
+        if (ID == read_id){
+            finded = 1;
+            break; 
+        }
     }
     fclose(fptr);
-    return saldo;
+    if(finded == 1)
+        return saldo;
+    else
+        return -1;
 }
 int TampilkanDaftarAkun(int ID, int nama, int saldo){
     FILE * fpointer, *fp;
@@ -77,7 +83,8 @@ int TampilkanDaftarAkun(int ID, int nama, int saldo){
     printf("-----------------------------\n");
     return 0;
 }
-int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
+int setorTunai(int ID, int Nominal, int mode){ // PAKAI INI UNTUK SETOR TUNAI
+    //mode : 0 = setor tunai, 1 = transfer masuk
     int nominalDump;
     char fileTXT[15];
 
@@ -143,7 +150,10 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
 
 
     fpointer = fopen(fileTXT, "a");
-    fprintf(fpointer, "[+] SETOR TUNAI\n");
+    if(mode == 0)
+        fprintf(fpointer, "[+] SETOR TUNAI\n");
+    else if(mode == 1)
+        fprintf(fpointer, "[+] TRANSFER MASUK\n");
 
     fprintf(fpointer, "    TGL: %s\n", tgl);
 
@@ -153,8 +163,9 @@ int setorTunai(int ID, int Nominal){ // PAKAI INI UNTUK SETOR TUNAI
     fclose(fpointer);
 }
 
-int tarikTunai(int ID, int Nominal)
+int tarikTunai(int ID, int Nominal, int mode)
 { // PAKAI INI UNTUK TARIK TUNAI
+    //mode : 0 = tarik tunai, 1 = transfer keluar
     int nominalDump;
     char fileTXT[15];
 
@@ -232,7 +243,10 @@ int tarikTunai(int ID, int Nominal)
     strcat(waktu, Detik);
 
     fpointer = fopen(fileTXT, "a");
-    fprintf(fpointer, "[-] TARIK TUNAI\n");
+    if(mode == 0)
+        fprintf(fpointer, "[-] TARIK TUNAI\n");
+    else if(mode == 1)
+        fprintf(fpointer, "[-] TRANSFER KELUAR\n");
 
     fprintf(fpointer, "    TGL: %s\n", tgl);
 
@@ -291,9 +305,9 @@ int setorAdmin();
 int tarikAdmin();
 int detailAdmin();
 //   MODE USER
-int userMode(int ID);
+int userMode(int ID, char password[]);
 int tarikUser(int ID);
-
+void transferRek(int ID, char password[]);
 
 int main(){
     int pilih, ID;
@@ -360,7 +374,7 @@ int main(){
                             token = strtok(NULL, ",");
                             if(strcmp(token, password) == 0){
                                 fclose(fpointer);
-                                userMode(ID);
+                                userMode(ID, password);
                                 return 0;
                             }
                         }
@@ -571,7 +585,7 @@ int setorAdmin(){
         if (atoi(token) == plhID){
             printf("Masukan nominal:");
             scanf("%d", &nominal);
-            setorTunai(plhID, nominal);
+            setorTunai(plhID, nominal, 0);
             printf("Setor tunai berhasil dilakukan\n");
             system("pause");
             fclose(fpointer);
@@ -611,7 +625,7 @@ int tarikAdmin()
         {
             printf("Masukan nominal:");
             scanf("%d", &nominal);
-            if (tarikTunai(plhID, nominal))
+            if (tarikTunai(plhID, nominal, 0))
             {
                 printf("Tarik tunai berhasil dilakukan\n");
             }
@@ -647,7 +661,7 @@ int detailAdmin(){
 }
 
 //   MODE USER
-int userMode(int ID){
+int userMode(int ID, char password[]){
     int pilih;
     while (1){
         printf("   PROGRAM KAS KELAS\n"
@@ -667,12 +681,12 @@ int userMode(int ID){
                 tarikUser(ID);
                 break;
             case 3:
-                // transfer();
+                transferRek(ID,password);
                 break;
             case 4:
                 exit(0);
             default:
-                printf("maaf tidak ada dalam menu\n");
+                printf("maaf pilihan tidak ada dalam menu\n");
         }
     }
     return 0;
@@ -688,7 +702,7 @@ int tarikUser(int ID)
     printf("Masukan nominal:");
     scanf("%d", &nominal);
 
-    if (tarikTunai(ID, nominal))
+    if (tarikTunai(ID, nominal, 0))
     {
         printf("Tarik tunai berhasil dilakukan\n");
     }
@@ -698,4 +712,85 @@ int tarikUser(int ID)
     }
     system("pause");
     return 0;
+}
+
+void transferRek(int ID, char password[]){
+    int ID_tujuan, saldo_tujuan, saldo_user, nominal;
+    char nama_tujuan;
+ 
+    printf("   PROGRAM KAS KELAS\n"
+           "       --USER--\n"
+           "       TRANSFER\n");
+    printf("Informasi tujuan :\n");
+    printf("ID :");
+    scanf("%d", &ID_tujuan);
+    printf("Masukkan nominal :");
+    scanf("%d", &nominal);
+
+    saldo_user = getSaldo(ID);
+    saldo_tujuan = getSaldo(ID_tujuan);
+
+    if(saldo_tujuan == -1){
+        printf("Akun tujuan tidak ditemukan\n");
+        system("pause");
+        return;
+    }
+
+    if(saldo_user < nominal){
+        printf("Saldo anda tidak mencukupi untuk melakukan transfer\n");
+        system("pause");
+        return;
+    }
+
+    char user_file[100], tujuan_file[100];
+    
+    itoa(ID, user_file, 10);
+    itoa(ID_tujuan, tujuan_file, 10);
+    strcat(user_file, ".txt");
+    strcat(tujuan_file, ".txt");
+    
+    FILE *fptr_user = fopen(user_file, "a+");
+    FILE *fptr_tujuan = fopen(tujuan_file, "a+");
+    fgets(user_file, 100, fptr_user);   //scanf nama user
+    fseek(fptr_user, 100, SEEK_SET);
+    fgets(tujuan_file, 100, fptr_tujuan); //scanf nama tujuan
+    
+    printf("\n|::::::::::::DETAIL TRANSFER:::::::::|\n"
+           "--- Rekening Asal :\n");
+    printf("     ID : %d\n", ID);
+    printf("%s\n", user_file);
+    printf("--- Rekening Tujuan :\n");
+    printf("     ID : %d\n", ID_tujuan);
+    printf("%s\n", tujuan_file);
+
+    printf("Besar Nominal transfer : %ld\n", nominal);
+
+    int is_continue;
+
+    label_check_continue_transfer:
+
+    printf("Lakukan transfer (1 = yes, 0 = no) :");
+    scanf("%d", &is_continue);
+
+    if(is_continue == 1){
+        setorTunai(ID_tujuan, nominal, 1);
+        tarikTunai(ID, nominal, 1);
+        fprintf(fptr_user, "    REKENING TUJUAN: %d\n\n", ID_tujuan);
+        fprintf(fptr_tujuan, "    REKENING PENGIRIM: %d\n\n", ID);
+        printf("Transfer berhasil dilakukan ke rekening dengan ID %d\n", ID_tujuan);
+        printf("Saldo anda saat ini : %d\n", getSaldo(ID));
+        printf("\n----------------------------\n");
+        system("pause");
+        fclose(fptr_user);
+        fclose(fptr_tujuan);
+    }else if(is_continue == 0){
+        printf("Transfer dibatalkan\n");
+        fclose(fptr_user);
+        fclose(fptr_tujuan);
+        system("pause");
+        return;
+    }else{
+        printf("Input salah\n");
+        goto label_check_continue_transfer;
+    }
 }
