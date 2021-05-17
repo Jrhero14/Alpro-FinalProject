@@ -309,9 +309,9 @@ int setorAdmin();
 int tarikAdmin();
 int detailAdmin();
 //   MODE USER
-int userMode(int ID, char password[]);
+int userMode(int ID);
 int tarikUser(int ID);
-void transferRek(int ID, char password[]);
+void transferRek(int ID);
 
 int main(){
     system("cls");
@@ -383,7 +383,7 @@ int main(){
                             token = strtok(NULL, ",");
                             if(strcmp(token, password) == 0){
                                 fclose(fpointer);
-                                userMode(ID, password);
+                                userMode(ID);
                                 return 0;
                             }
                         }
@@ -493,7 +493,7 @@ int tambahAkun(){
     printf("|*|Masukan password:");
     fflush(stdin);
     fgets(password, sizeof(password), stdin);
-    int passRepeat[100];
+    char passRepeat[100];
     while (1){
         printf("|*|Masukan kembali password:");
         fgets(passRepeat, sizeof(passRepeat), stdin);
@@ -705,7 +705,7 @@ int detailAdmin(){
 }
 
 //   MODE USER
-int userMode(int ID, char password[]){
+int userMode(int ID){
     int pilih;
     while (1){
         system("cls");
@@ -733,7 +733,7 @@ int userMode(int ID, char password[]){
                 tarikUser(ID);
                 break;
             case 3:
-                transferRek(ID,password);
+                transferRek(ID);
                 break;
             case 4:
                 exit(0);
@@ -771,7 +771,7 @@ int tarikUser(int ID)
     return 0;
 }
 
-void transferRek(int ID, char password[]){
+void transferRek(int ID){
     system("cls");
     int ID_tujuan, saldo_tujuan, saldo_user, nominal;
     char nama_tujuan;
