@@ -6,7 +6,6 @@
 // Universal Function
 int getSaldo(int ID)
 {
-	system("cls");
     int finded = 0;
     FILE *fptr = fopen("account.csv", "r");
 
@@ -26,7 +25,7 @@ int getSaldo(int ID)
     {
         if (ID == read_id){
             finded = 1;
-            break; 
+            break;
         }
     }
     fclose(fptr);
@@ -36,7 +35,7 @@ int getSaldo(int ID)
         return -1;
 }
 int TampilkanDaftarAkun(int ID, int nama, int saldo){
-	system("cls");
+    system("cls");
     FILE * fpointer, *fp;
     fpointer = fopen("account.csv", "r");
 
@@ -159,7 +158,7 @@ int setorTunai(int ID, int Nominal, int mode){ // PAKAI INI UNTUK SETOR TUNAI
         fprintf(fpointer, "[+] TRANSFER MASUK [+]\n");
 
     fprintf(fpointer, " |TGL: %s   \n", tgl);
-    
+
     fprintf(fpointer, " |PUKUL: %s\n", waktu);
     fprintf(fpointer, " |NOMINAL: %d   \n\n", Nominal);
 
@@ -194,11 +193,11 @@ int tarikTunai(int ID, int Nominal, int mode)
             fprintf(fp, ",");
             token = strtok(NULL, ",");
             nominalDump = atoi(token);
-            if (nominalDump == 0)
+            nominalDump = nominalDump - Nominal;
+            if (nominalDump < 0)
             {
                 return 0;
             }
-            nominalDump = nominalDump - Nominal;
             itoa(nominalDump, charNominal, 10);
             fprintf(fp, charNominal);
             fprintf(fp, ",");
@@ -253,7 +252,7 @@ int tarikTunai(int ID, int Nominal, int mode)
         fprintf(fpointer, "[-] TRANSFER KELUAR [-]\n");
 
     fprintf(fpointer, " |TGL: %s\n", tgl);
-    
+
     fprintf(fpointer, " |PUKUL: %s\n", waktu);
     fprintf(fpointer, " |NOMINAL: %d\n\n", Nominal);
 
@@ -263,8 +262,7 @@ int tarikTunai(int ID, int Nominal, int mode)
 
 void lihatDetailAkun(int ID, int mode)
 {
-	system("cls");
-//    system("cls");
+    system("cls");
     char buff[100], txtFile[15];
     itoa(ID, txtFile, 10);
     strcat(txtFile, ".txt");
@@ -285,7 +283,7 @@ void lihatDetailAkun(int ID, int mode)
         printf("       --USER--\n");
     printf("INFORMASI AKUN :\n");
 
-    printf("     |*|ID : %d\n", ID);
+    printf("|*|ID : %d\n", ID);
     for (int i = 0; i < 4; i++)
     {
         fgets(buff, sizeof(buff), fptr);
@@ -300,6 +298,7 @@ void lihatDetailAkun(int ID, int mode)
     printf("\n----------------------------\n");
     system("pause");
     fclose(fptr);
+    system("cls");
 }
 
 //   MODE ADMIN
@@ -315,11 +314,11 @@ int tarikUser(int ID);
 void transferRek(int ID, char password[]);
 
 int main(){
-	system("cls");
+    system("cls");
     int pilih, ID;
     char password[100];
     char *token;
-	printf("|+|---------------------------------|+|\n");
+    printf("|+|---------------------------------|+|\n");
     printf("|+|     |   PROGRAM KAS KELAS  |    |+|\n");
     printf("|+|---------------------------------|+|\n");
     printf("|+|     |   1. ADMIN           |    |+|\n");
@@ -408,10 +407,10 @@ int main(){
 ///  MODE ADMIN
 
 int adminMode(){
-	system("cls");
+    system("cls");
     int pilih;
     while (1){
-    	printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
         printf("|*|       PROGRAM KAS KELAS       |*|\n");
         printf("|*|-------------------------------|*|\n");
         printf("|*|-------------ADMIN-------------|*|\n");
@@ -457,7 +456,7 @@ int adminMode(){
 }
 
 int tambahAkun(){
-	system("cls");
+    system("cls");
     int umur, pilKelamin, ID;
     char nama[50], tanggal[12], jenisKelamin[12], password[100];
     printf("|*|-------------------------------|*|\n");
@@ -527,23 +526,24 @@ int tambahAkun(){
 
 
     system("pause");
+    system("cls");
     return 0;
 }
 
 int hapusAkun(){
-	system("cls");
+    system("cls");
     int pilID;
     if (TampilkanDaftarAkun(1,1,0))
     {
         return 0;
     }else{
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|       PROGRAM KAS KELAS       |*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|-------------ADMIN-------------|*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|          HAPUS AKUN           |*|\n");
-    printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|       PROGRAM KAS KELAS       |*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------ADMIN-------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|          HAPUS AKUN           |*|\n");
+        printf("|*|-------------------------------|*|\n");
         printf("|*|PILIH ID:");
         scanf("%d", &pilID);
     }
@@ -588,22 +588,23 @@ int hapusAkun(){
 
     printf("|*|HAPUS AKUN BERHASIL|*|\n");
     system("pause");
+    system("cls");
 }
 
 int setorAdmin(){
-	system("cls");
+    system("cls");
     int plhID, nominal;
     if (TampilkanDaftarAkun(1,1,1))
     {
         return 0;
     }else{
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|       PROGRAM KAS KELAS       |*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|-------------ADMIN-------------|*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|          SETOR TUNAI          |*|\n");
-    printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|       PROGRAM KAS KELAS       |*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------ADMIN-------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|          SETOR TUNAI          |*|\n");
+        printf("|*|-------------------------------|*|\n");
         printf("|*|PILIH ID:");
         scanf("%d", &plhID);
     }
@@ -629,23 +630,24 @@ int setorAdmin(){
     fclose(fpointer);
     printf("|*|Akun tidak ditemukan!!|*|\n");
     system("pause");
+    system("cls");
 }
 
 int tarikAdmin()
 {
-	system("cls");
+    system("cls");
     int plhID, nominal;
     if (TampilkanDaftarAkun(1,1,1))
     {
         return 0;
     }else{
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|       PROGRAM KAS KELAS       |*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|-------------ADMIN-------------|*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|          TARIK TUNAI          |*|\n");
-    printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|       PROGRAM KAS KELAS       |*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------ADMIN-------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|          TARIK TUNAI          |*|\n");
+        printf("|*|-------------------------------|*|\n");
         printf("|*|PILIH ID:");
         scanf("%d", &plhID);
     }
@@ -679,22 +681,23 @@ int tarikAdmin()
     fclose(fpointer);
     printf("|*|Akun tidak ditemukan!!|*|\n");
     system("pause");
+    system("cls");
 }
 
 int detailAdmin(){
-	system("cls");
+    system("cls");
     int plhID, nominal;
     if (TampilkanDaftarAkun(1,1,0))
     {
         return 0;
     }else{
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|       PROGRAM KAS KELAS       |*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|-------------ADMIN-------------|*|\n");
-    printf("|*|-------------------------------|*|\n");
-    printf("|*|       LIHAT DETAIL AKUN       |*|\n");
-    printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|       PROGRAM KAS KELAS       |*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|-------------ADMIN-------------|*|\n");
+        printf("|*|-------------------------------|*|\n");
+        printf("|*|       LIHAT DETAIL AKUN       |*|\n");
+        printf("|*|-------------------------------|*|\n");
         printf("|*|PILIH ID:");
         scanf("%d", &plhID);
     }
@@ -703,10 +706,10 @@ int detailAdmin(){
 
 //   MODE USER
 int userMode(int ID, char password[]){
-	system("cls");
     int pilih;
     while (1){
-    	printf("|*|-------------------------------|*|\n");
+        system("cls");
+        printf("|*|-------------------------------|*|\n");
         printf("|*|       PROGRAM KAS KELAS       |*|\n");
         printf("|*|-------------------------------|*|\n");
         printf("|*|-------------USER--------------|*|\n");
@@ -736,6 +739,7 @@ int userMode(int ID, char password[]){
                 exit(0);
             default:
                 printf("|*|maaf pilihan tidak ada dalam menu\n");
+                system("pause");
         }
     }
     return 0;
@@ -743,7 +747,7 @@ int userMode(int ID, char password[]){
 
 int tarikUser(int ID)
 {
-	system("cls");
+    system("cls");
     int nominal;
     printf("|*|-------------------------------|*|\n");
     printf("|*|       PROGRAM KAS KELAS       |*|\n");
@@ -768,10 +772,10 @@ int tarikUser(int ID)
 }
 
 void transferRek(int ID, char password[]){
-	system("cls");
+    system("cls");
     int ID_tujuan, saldo_tujuan, saldo_user, nominal;
     char nama_tujuan;
- 
+
     printf("|*|-------------------------------|*|\n");
     printf("|*|       PROGRAM KAS KELAS       |*|\n");
     printf("|*|-------------------------------|*|\n");
@@ -801,18 +805,18 @@ void transferRek(int ID, char password[]){
     }
 
     char user_file[100], tujuan_file[100];
-    
+
     itoa(ID, user_file, 10);
     itoa(ID_tujuan, tujuan_file, 10);
     strcat(user_file, ".txt");
     strcat(tujuan_file, ".txt");
-    
+
     FILE *fptr_user = fopen(user_file, "a+");
     FILE *fptr_tujuan = fopen(tujuan_file, "a+");
     fgets(user_file, 100, fptr_user);   //scanf nama user
     fseek(fptr_user, 100, SEEK_SET);
     fgets(tujuan_file, 100, fptr_tujuan); //scanf nama tujuan
-    
+
     printf("|*|-------------------------------|*|\n");
     printf("|*|        DETAIL TRANSFER        |*|\n");
     printf("|*|-------------------------------|*|\n");
