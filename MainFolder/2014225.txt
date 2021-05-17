@@ -1,0 +1,25 @@
+     NAMA:febri
+     UMUR:210
+     TANGGAL LAHIR:19/03/22
+     KELAMIN:Laki-laki
+------History Transaksi------
+[+] SETOR TUNAI [+]
+ |TGL: 2021/5/16   |
+ |PUKUL: 20:1:8|
+ |NOMINAL: 120000   |
+
+[+] TRANSFER MASUK [+]
+ |TGL: 2021/5/16   
+ |PUKUL: 20:44:2
+ |NOMINAL: 2000   
+
+[+] TRANSFER MASUK [+]
+ |TGL: 2021/5/16   
+ |PUKUL: 20:47:7
+ |NOMINAL: 10000   
+
+[-] TARIK TUNAI [-]
+ |TGL: 2021/5/16
+ |PUKUL: 20:48:36
+ |NOMINAL: 1000
+

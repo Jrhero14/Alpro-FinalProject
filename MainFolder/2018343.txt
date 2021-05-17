@@ -1,0 +1,5 @@
+|*|NAMA:asdasd
+|*|UMUR:12
+|*|TANGGAL LAHIR:11/12/22
+|*|KELAMIN:Laki-laki
+------History Transaksi------

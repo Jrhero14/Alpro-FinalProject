@@ -1,0 +1,15 @@
+     NAMA:daniel
+     UMUR:22
+     TANGGAL LAHIR:22/06/02
+     KELAMIN:Laki-laki
+------History Transaksi------
+[+] SETOR TUNAI
+ |TGL: 2021/5/16   |
+ |PUKUL: 19:58:40 |
+ |NOMINAL: 10000   |
+
+[+] TRANSFER MASUK [+]
+ |TGL: 2021/5/17   
+ |PUKUL: 12:30:39
+ |NOMINAL: 1000   
+
